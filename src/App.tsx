@@ -48,7 +48,6 @@ function App() {
     
     setIsReady(true);
     setSequence(newSequence);
-    setIsPlayerToPlay(true);
   }, [sequence]);
 
   const checkSequence = useCallback(
@@ -83,15 +82,21 @@ function App() {
   );
 
   useEffect(() => {
-    if(currentIndex < 4){
-      setTimeout(() => {
-        setCurrentIndex(currentIndex + 1);
+    if (isReady && !isPlayerToPlay) {
+      let i = 0;
+      const intervalId = setInterval(() => {
+        if (i < sequence.length) {
+          setCurrentIndex(i);
+          i++;
+        } else {
+          clearInterval(intervalId);
+          setIsPlayerToPlay(true);
+          setCurrentIndex(0); // Préparez pour l'entrée de l'utilisateur
+        }
       }, 1000);
+      return () => clearInterval(intervalId);
     }
-    else {
-      setCurrentIndex(0);
-    }
-  }, [currentIndex]);  
+  }, [isReady, sequence, isPlayerToPlay]);
 
   console.log("sequence", sequence, currentIndex, highlightIndex);
 
@@ -103,7 +108,7 @@ function App() {
             <Square
               key={color.id}
               color={
-                highlightIndex === color.id
+                highlightIndex === color.id && !isPlayerToPlay
                   ? color.highlightColor
                   : color.color
               }
