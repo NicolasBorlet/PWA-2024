@@ -8,7 +8,7 @@ export interface SquareProps {
   onClick?: () => void;
 }
 
-const Square: React.FC<SquareProps> = ({ id, color, clickable, onClick }) => {
+const Square: React.FC<SquareProps> = ({ color, clickable, onClick }) => {
   return (
     <div
       style={{
