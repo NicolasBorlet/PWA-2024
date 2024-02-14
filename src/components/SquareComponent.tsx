@@ -1,27 +1,24 @@
-import React, { useCallback } from "react";
+import React from "react";
 
-interface SquareProps {
-  id: string;
+export interface SquareProps {
+  id: number;
   name: string;
   color: string;
   clickable?: boolean;
+  onClick?: () => void;
 }
 
-const Square: React.FC<SquareProps> = (square) => {
-  const handleClick = useCallback(() => {
-    console.log("Square Clicked", square.id);
-  }, []);
-
+const Square: React.FC<SquareProps> = ({ id, color, clickable, onClick }) => {
   return (
     <div
       style={{
-        backgroundColor: square.color,
+        backgroundColor: color,
         height: "160px",
         width: "160px",
+        cursor: clickable ? "pointer" : "default",
       }}
-      onClick={square.clickable ? handleClick : undefined}
+      onClick={onClick}
     >
-      {square.name}
     </div>
   );
 };
