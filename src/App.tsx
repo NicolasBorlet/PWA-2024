@@ -108,6 +108,7 @@ function App() {
       // Check whether notification permissions have already been granted;
       // if so, create a notification
       new Notification("Hi there!");
+      navigator.vibrate([200, 100, 200]);
       // …
     } else if (Notification.permission !== "denied") {
       // We need to ask the user for permission
