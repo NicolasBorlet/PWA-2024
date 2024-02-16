@@ -103,7 +103,7 @@ function App() {
   console.log("sequence", sequence, currentIndex, highlightIndex);
 
   useEffect(() => {
-    fetch('http://localhost:3000/get')
+    fetch('https://serviceworker-60dw.onrender.com/get')
     .then(response => response.json())
     .then(data => setDate(data))
   }, [])
@@ -120,10 +120,14 @@ function App() {
       // Check whether notification permissions have already been granted;
       // if so, create a notification
       new Notification("Hi there!");
-      // navigator.vibrate([200, 100, 200]);
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+      }
       // …
     } else if (Notification.permission !== "denied") {
-      // navigator.vibrate([200, 100, 200]);
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+      }
       // We need to ask the user for permission
       Notification.requestPermission().then((permission) => {
         // If the user accepts, let's create a notification

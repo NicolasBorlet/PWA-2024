@@ -32,7 +32,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {
-            urlPattern: new RegExp('http://localhost:3000/get'),
+            urlPattern: new RegExp('https://serviceworker-60dw.onrender.com/get'),
             handler: 'CacheFirst',
             options: {
               cacheName: 'api-cache',
