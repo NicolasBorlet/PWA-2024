@@ -35,6 +35,8 @@ function App() {
   const [isReady, setIsReady] = useState(false);
   const [isPlayerToPlay, setIsPlayerToPlay] = useState(false);
   
+  const [date, setDate] = useState();
+
   const highlightIndex = useMemo(
     () => sequence[currentIndex],
     [currentIndex, sequence]
@@ -99,6 +101,16 @@ function App() {
   }, [isReady, sequence, isPlayerToPlay]);
 
   console.log("sequence", sequence, currentIndex, highlightIndex);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/get')
+    .then(response => response.json())
+    .then(data => setDate(data))
+  }, [])
+
+  useEffect(() => {
+    console.log(date);
+  }, [date])
 
   function notifyMe() {
     if (!("Notification" in window)) {

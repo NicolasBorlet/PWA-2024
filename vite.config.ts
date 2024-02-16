@@ -27,6 +27,26 @@ export default defineConfig({
         ]
       },
       injectRegister: 'auto',
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [
+          {
+            urlPattern: new RegExp('http://localhost:3000/get'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          }
+        ]
+      }
     })
   ]
 });
