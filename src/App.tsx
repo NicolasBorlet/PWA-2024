@@ -112,13 +112,45 @@ function App() {
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
       recognition.onresult = (event: any) => {
-        const spokenWord = event.results[0][0].transcript.trim().toLowerCase();
-        //@ts-ignore
-        const foundColor = colorDictionary[spokenWord];
-        if (foundColor && isPlayerToPlay) {
-          checkSequence(foundColor.id);
+        // Sépare les mots prononcés dans la transcription
+        const spokenWords = event.results[0][0].transcript.trim().toLowerCase().split(' ');
+        // Créez une copie temporaire de l'index actuel pour le vérifier contre la séquence
+        let tempIndex = currentIndex;
+      
+        // Vérifiez chaque mot prononcé contre la séquence attendue
+        for (const word of spokenWords) {
+          //@ts-ignore
+          const foundColor = colorDictionary[word];
+          // Vérifiez si la couleur prononcée correspond à la couleur attendue dans la séquence
+          if (foundColor && sequence[tempIndex] === foundColor.id) {
+            // Si la couleur est correcte, avancez temporairement dans la séquence
+            tempIndex++;
+            if (tempIndex === sequence.length) {
+              // Si toutes les couleurs ont été correctement identifiées, ajoutez une nouvelle couleur
+              console.log("Sequence completed, add new color");
+              setIsPlayerToPlay(false); // Empêche d'autres clics pendant la mise à jour de la séquence
+              const newSequence = [...sequence, colors[Math.floor(Math.random() * colors.length)].id];
+              setSequence(newSequence);
+              setCurrentIndex(0);
+              break; // Sortie de la boucle, car la séquence est terminée
+            }
+          } else {
+            // Si une couleur est incorrecte, réinitialisez la séquence
+            console.log("wrong");
+            setIsPlayerToPlay(false);
+            setIsReady(false);
+            setSequence([]);
+            setCurrentIndex(0);
+            break; // Sortie de la boucle après une erreur
+          }
         }
-      };      
+      
+        // Mise à jour de l'indice courant si toutes les couleurs étaient correctes
+        if (tempIndex !== currentIndex && tempIndex < sequence.length) {
+          setCurrentIndex(tempIndex);
+          setIsPlayerToPlay(true); // Permettre au joueur de continuer à jouer
+        }
+      };         
       setSpeechRecognition(recognition);
     }
   }, [isPlayerToPlay]); // Ajout de isPlayerToPlay dans les dépendances pour réinitialiser l'API de reconnaissance vocale en fonction de l'état du jeu
