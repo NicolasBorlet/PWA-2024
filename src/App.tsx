@@ -35,8 +35,6 @@ function App() {
   const [isReady, setIsReady] = useState(false);
   const [isPlayerToPlay, setIsPlayerToPlay] = useState(false);
   
-  const [date, setDate] = useState();
-
   const highlightIndex = useMemo(
     () => sequence[currentIndex],
     [currentIndex, sequence]
@@ -100,53 +98,18 @@ function App() {
     }
   }, [isReady, sequence, isPlayerToPlay]);
 
-  console.log("sequence", sequence, currentIndex, highlightIndex);
-
   useEffect(() => {
-    fetch('https://serviceworker-60dw.onrender.com/get')
-    .then(response => response.json())
-    .then(data => setDate(data))
-  }, [])
+    const speakColor = (colorName: string) => {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(colorName);
+      synth.speak(utterance);
+    };
 
-  useEffect(() => {
-    console.log(date);
-  }, [date])
-
-  function notifyMe() {
-    if (!("Notification" in window)) {
-      // Check if the browser supports notifications
-      alert("This browser does not support desktop notification");
-    } else if (Notification.permission === "granted") {
-      // Check whether notification permissions have already been granted;
-      // if so, create a notification
-      new Notification("Hi there!");
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]);
-      }
-      // …
-    } else if (Notification.permission !== "denied") {
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]);
-      }
-      // We need to ask the user for permission
-      Notification.requestPermission().then((permission) => {
-        // If the user accepts, let's create a notification
-        if (permission === "granted") {
-          new Notification("Hi there!");
-          // …
-        }
-      });
+    if (highlightIndex !== undefined && !isPlayerToPlay) {
+      speakColor(colors.find(color => color.id === highlightIndex)?.name || '');
     }
-  
-    // At last, if the user has denied notifications, and you
-    // want to be respectful there is no need to bother them anymore.
-  }
-  
+  }, [highlightIndex, isPlayerToPlay]);
 
-  useEffect(() => {
-    notifyMe();
-  }, []);
-   
   return (
     <>
       {isReady ? (
