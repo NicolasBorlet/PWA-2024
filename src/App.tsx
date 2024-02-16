@@ -34,7 +34,9 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const [isPlayerToPlay, setIsPlayerToPlay] = useState(false);
-  
+  const [isTalking, setIsTalking] = useState(false);
+  const [speechRecognition, setSpeechRecognition] = useState<any>(null);
+
   const highlightIndex = useMemo(
     () => sequence[currentIndex],
     [currentIndex, sequence]
@@ -81,6 +83,39 @@ function App() {
     [currentIndex, sequence, isPlayerToPlay]
   );
 
+  const startTalking = () => {
+    setIsTalking(true);
+    if (speechRecognition) {
+      speechRecognition.start();
+    }
+  };
+
+  const stopTalking = () => {
+    setIsTalking(false);
+    if (speechRecognition) {
+      speechRecognition.stop();
+    }
+  };
+
+  useEffect(() => {
+    //@ts-ignore
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'fr-FR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onresult = (event: any) => {
+        const spokenWord = event.results[0][0].transcript.trim().toLowerCase();
+        const foundColor = colors.find(color => color.name.toLowerCase() === spokenWord);
+        if (foundColor && isPlayerToPlay) {
+          checkSequence(foundColor.id);
+        }
+      };
+      setSpeechRecognition(recognition);
+    }
+  }, [isPlayerToPlay]); // Ajout de isPlayerToPlay dans les dépendances pour réinitialiser l'API de reconnaissance vocale en fonction de l'état du jeu
+
   useEffect(() => {
     if (isReady && !isPlayerToPlay) {
       let i = 0;
@@ -117,11 +152,7 @@ function App() {
           {colors.map((color) => (
             <Square
               key={color.id}
-              color={
-                highlightIndex === color.id && !isPlayerToPlay
-                  ? color.highlightColor
-                  : color.color
-              }
+              color={highlightIndex === color.id && !isPlayerToPlay ? color.highlightColor : color.color}
               name={color.name}
               id={color.id}
               clickable={isPlayerToPlay}
@@ -130,6 +161,15 @@ function App() {
               }}
             />
           ))}
+          <button 
+            onMouseDown={startTalking} 
+            onMouseUp={stopTalking} 
+            onTouchStart={startTalking} // Pour les appareils tactiles
+            onTouchEnd={stopTalking}
+            className="talk-button"
+          >
+            {isTalking ? "Parler" : "Parler (cliquez et parlez)"}
+          </button>
         </div>
       ) : (
         <div>
