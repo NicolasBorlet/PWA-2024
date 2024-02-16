@@ -83,6 +83,12 @@ function App() {
     [currentIndex, sequence, isPlayerToPlay]
   );
 
+  const colorDictionary = colors.reduce((dict, color) => {
+    //@ts-ignore
+    dict[color.name.toLowerCase()] = color;
+    return dict;
+  }, {});
+
   const startTalking = () => {
     setIsTalking(true);
     if (speechRecognition) {
@@ -107,11 +113,12 @@ function App() {
       recognition.maxAlternatives = 1;
       recognition.onresult = (event: any) => {
         const spokenWord = event.results[0][0].transcript.trim().toLowerCase();
-        const foundColor = colors.find(color => color.name.toLowerCase() === spokenWord);
+        //@ts-ignore
+        const foundColor = colorDictionary[spokenWord];
         if (foundColor && isPlayerToPlay) {
           checkSequence(foundColor.id);
         }
-      };
+      };      
       setSpeechRecognition(recognition);
     }
   }, [isPlayerToPlay]); // Ajout de isPlayerToPlay dans les dépendances pour réinitialiser l'API de reconnaissance vocale en fonction de l'état du jeu
@@ -148,29 +155,31 @@ function App() {
   return (
     <>
       {isReady ? (
-        <div className="grid grid-cols-2 gap-4">
-          {colors.map((color) => (
-            <Square
-              key={color.id}
-              color={highlightIndex === color.id && !isPlayerToPlay ? color.highlightColor : color.color}
-              name={color.name}
-              id={color.id}
-              clickable={isPlayerToPlay}
-              onClick={() => {
-                checkSequence(color.id);
-              }}
-            />
-          ))}
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            {colors.map((color) => (
+              <Square
+                key={color.id}
+                color={highlightIndex === color.id && !isPlayerToPlay ? color.highlightColor : color.color}
+                name={color.name}
+                id={color.id}
+                clickable={isPlayerToPlay}
+                onClick={() => {
+                  checkSequence(color.id);
+                }}
+              />
+            ))}
+          </div>
           <button 
-            onMouseDown={startTalking} 
-            onMouseUp={stopTalking} 
-            onTouchStart={startTalking} // Pour les appareils tactiles
-            onTouchEnd={stopTalking}
-            className="talk-button"
-          >
-            {isTalking ? "Parler" : "Parler (cliquez et parlez)"}
-          </button>
-        </div>
+              onMouseDown={startTalking} 
+              onMouseUp={stopTalking} 
+              onTouchStart={startTalking} // Pour les appareils tactiles
+              onTouchEnd={stopTalking}
+              className="talk-button"
+            >
+              {isTalking ? "Parler" : "Parler (cliquez et parlez)"}
+            </button>
+        </>
       ) : (
         <div>
           <button onClick={handleIsReady}>Je suis prêt</button>
