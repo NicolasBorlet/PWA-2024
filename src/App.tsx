@@ -38,6 +38,15 @@ function App() {
   const [speechRecognition, setSpeechRecognition] = useState<unknown>(null);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
 
+  const isIOS = () => {
+    // Les appareils iOS sont les seuls à avoir la fenêtre.navigator.standalone
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    // @ts-expect-error abc
+    return /iphone|ipad|ipod/.test(userAgent) && !window.navigator.standalone;
+  };
+
+  const [showIOSInstructions, setShowIOSInstructions] = useState(isIOS());
+
   const highlightIndex = useMemo(
     () => sequence[currentIndex],
     [currentIndex, sequence]
@@ -272,11 +281,22 @@ function App() {
       ) : (
         <div>
           <button onClick={handleIsReady}>Je suis prêt</button>
-          {/* {deferredPrompt && ( */}
-          <button onClick={promptInstall} className="pwa-install-button">
-            Installer l'application
-          </button>
-          {/* )} */}
+          {deferredPrompt && (
+            <button onClick={promptInstall} className="pwa-install-button">
+              Installer l'application
+            </button>
+          )}
+          {showIOSInstructions && (
+            <div className="ios-instructions">
+              <p>
+                Pour installer cette application sur votre iPhone, appuyez sur
+                l'icône de partage et ensuite sur "Sur l'écran d'accueil".
+              </p>
+              <button onClick={() => setShowIOSInstructions(false)}>
+                Fermer
+              </button>
+            </div>
+          )}
         </div>
       )}
     </>
