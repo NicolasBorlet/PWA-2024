@@ -318,7 +318,13 @@ function App() {
         <div>
           <button onClick={handleIsReady}>Je suis prêt</button>
           {PWAIsInstalled ? (
-            <p>L'application est installée</p>
+            <button
+              onClick={() => {
+                window.open("https://pwa-color-game.netlify.app/");
+              }}
+            >
+              Ouvrir avec l'application
+            </button>
           ) : (
             <>
               {deferredPrompt && (
