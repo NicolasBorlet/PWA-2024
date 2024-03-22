@@ -148,6 +148,7 @@ function App() {
   };
 
   const isPWAInstalledIos = () => {
+    // @ts-expect-error abc
     return window.navigator.standalone === true;
   };
 
@@ -252,14 +253,11 @@ function App() {
       setPWAIsInstalled(true);
     });
 
-    let isAppInstalled = true;
-
     const handleBeforeInstallPrompt = (e: undefined) => {
       // Empêche Chrome 67 et versions antérieures d'afficher automatiquement le prompt
       // @ts-expect-error abc
       e.preventDefault();
 
-      isAppInstalled = false;
       // Stockez l'événement pour pouvoir le déclencher plus tard
       // @ts-expect-error abc
       setDeferredPrompt(e);
