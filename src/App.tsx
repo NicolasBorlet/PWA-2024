@@ -35,7 +35,7 @@ function App() {
   const [isReady, setIsReady] = useState(false);
   const [isPlayerToPlay, setIsPlayerToPlay] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
-  const [speechRecognition, setSpeechRecognition] = useState<any>(null);
+  const [speechRecognition, setSpeechRecognition] = useState<unknown>(null);
 
   const highlightIndex = useMemo(
     () => sequence[currentIndex],
@@ -84,7 +84,7 @@ function App() {
   );
 
   const colorDictionary = colors.reduce((dict, color) => {
-    //@ts-ignore
+    // @ts-expect-error abc
     dict[color.name.toLowerCase()] = color;
     return dict;
   }, {});
@@ -92,6 +92,7 @@ function App() {
   const startTalking = () => {
     setIsTalking(true);
     if (speechRecognition) {
+      // @ts-expect-error abc
       speechRecognition.start();
     }
   };
@@ -99,21 +100,23 @@ function App() {
   const stopTalking = () => {
     setIsTalking(false);
     if (speechRecognition) {
+      // @ts-expect-error abc
       speechRecognition.stop();
     }
   };
 
   useEffect(() => {
-    //@ts-ignore
     const SpeechRecognition =
+      // @ts-expect-error abc
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.lang = "fr-FR";
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: unknown) => {
         // Sépare les mots prononcés dans la transcription
+        // @ts-expect-error abc
         const spokenWords = event.results[0][0].transcript
           .trim()
           .toLowerCase()
@@ -123,7 +126,7 @@ function App() {
 
         // Vérifiez chaque mot prononcé contre la séquence attendue
         for (const word of spokenWords) {
-          //@ts-ignore
+          // @ts-expect-error abc
           const foundColor = colorDictionary[word];
           // Vérifiez si la couleur prononcée correspond à la couleur attendue dans la séquence
           if (foundColor && sequence[tempIndex] === foundColor.id) {
