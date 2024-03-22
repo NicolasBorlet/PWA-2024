@@ -38,6 +38,14 @@ function App() {
   const [speechRecognition, setSpeechRecognition] = useState<unknown>(null);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
 
+  const isSafari = () => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    const isMac = /^((?!chrome|android).)*safari/i.test(userAgent); // Détecte Safari sur Mac mais exclut Chrome
+
+    return isIOS || isMac;
+  };
+
   const isIOS = () => {
     // Les appareils iOS sont les seuls à avoir la fenêtre.navigator.standalone
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -45,6 +53,9 @@ function App() {
     return /iphone|ipad|ipod/.test(userAgent) && !window.navigator.standalone;
   };
 
+  const [showSafariInstructions, setShowSafariInstructions] = useState(
+    isSafari()
+  );
   const [showIOSInstructions, setShowIOSInstructions] = useState(isIOS());
 
   const highlightIndex = useMemo(
@@ -293,6 +304,17 @@ function App() {
                 l'icône de partage et ensuite sur "Sur l'écran d'accueil".
               </p>
               <button onClick={() => setShowIOSInstructions(false)}>
+                Fermer
+              </button>
+            </div>
+          )}
+          {showSafariInstructions && (
+            <div className="safari-instructions">
+              <p>
+                Pour installer cette application sur votre iPhone, appuyez sur
+                l'icône de partage et ensuite sur "Ajouter à l'écran d'accueil".
+              </p>
+              <button onClick={() => setShowSafariInstructions(false)}>
                 Fermer
               </button>
             </div>
