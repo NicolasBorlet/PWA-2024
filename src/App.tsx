@@ -37,6 +37,7 @@ function App() {
   const [isTalking, setIsTalking] = useState(false);
   const [speechRecognition, setSpeechRecognition] = useState<unknown>(null);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [PWAIsInstalled, setPWAIsInstalled] = useState(false);
 
   const isSafari = () => {
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -136,8 +137,10 @@ function App() {
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === "accepted") {
           console.log("L'utilisateur a accepté l'A2HS prompt");
+          setPWAIsInstalled(true);
         } else {
           console.log("L'utilisateur a refusé l'A2HS prompt");
+          setPWAIsInstalled(false);
         }
         setDeferredPrompt(null);
       });
@@ -292,32 +295,40 @@ function App() {
       ) : (
         <div>
           <button onClick={handleIsReady}>Je suis prêt</button>
-          {deferredPrompt && (
-            <button onClick={promptInstall} className="pwa-install-button">
-              Installer l'application
-            </button>
-          )}
-          {showIOSInstructions && (
-            <div className="ios-instructions">
-              <p>
-                Pour installer cette application sur votre iPhone, appuyez sur
-                l'icône de partage et ensuite sur "Sur l'écran d'accueil".
-              </p>
-              <button onClick={() => setShowIOSInstructions(false)}>
-                Fermer
-              </button>
-            </div>
-          )}
-          {showSafariInstructions && (
-            <div className="safari-instructions">
-              <p>
-                Pour installer cette application sur votre iPhone, appuyez sur
-                l'icône de partage et ensuite sur "Ajouter à l'écran d'accueil".
-              </p>
-              <button onClick={() => setShowSafariInstructions(false)}>
-                Fermer
-              </button>
-            </div>
+          {PWAIsInstalled ? (
+            <p>L'application est installée</p>
+          ) : (
+            <>
+              {deferredPrompt && (
+                <button onClick={promptInstall} className="pwa-install-button">
+                  Installer l'application
+                </button>
+              )}
+              {showIOSInstructions && (
+                <div className="ios-instructions">
+                  <p>
+                    Pour installer cette application sur votre iPhone, appuyez
+                    sur l'icône de partage et ensuite sur "Sur l'écran
+                    d'accueil".
+                  </p>
+                  <button onClick={() => setShowIOSInstructions(false)}>
+                    Fermer
+                  </button>
+                </div>
+              )}
+              {showSafariInstructions && (
+                <div className="safari-instructions">
+                  <p>
+                    Pour installer cette application sur votre iPhone, appuyez
+                    sur l'icône de partage et ensuite sur "Ajouter à l'écran
+                    d'accueil".
+                  </p>
+                  <button onClick={() => setShowSafariInstructions(false)}>
+                    Fermer
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
