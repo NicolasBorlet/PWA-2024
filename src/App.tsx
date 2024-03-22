@@ -36,6 +36,7 @@ function App() {
   const [isPlayerToPlay, setIsPlayerToPlay] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [speechRecognition, setSpeechRecognition] = useState<unknown>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   const highlightIndex = useMemo(
     () => sequence[currentIndex],
@@ -102,6 +103,24 @@ function App() {
     if (speechRecognition) {
       // @ts-expect-error abc
       speechRecognition.stop();
+    }
+  };
+
+  const promptInstall = () => {
+    if (deferredPrompt) {
+      // Affichez le prompt d'installation
+      // @ts-expect-error abc
+      deferredPrompt.prompt();
+      // Attendez que l'utilisateur réponde à l'invite
+      // @ts-expect-error abc
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("L'utilisateur a accepté l'A2HS prompt");
+        } else {
+          console.log("L'utilisateur a refusé l'A2HS prompt");
+        }
+        setDeferredPrompt(null);
+      });
     }
   };
 
@@ -196,6 +215,28 @@ function App() {
     }
   }, [highlightIndex, isPlayerToPlay]);
 
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: undefined) => {
+      // Empêche Chrome 67 et versions antérieures d'afficher automatiquement le prompt
+      // @ts-expect-error abc
+      e.preventDefault();
+      // Stockez l'événement pour pouvoir le déclencher plus tard
+      // @ts-expect-error abc
+      setDeferredPrompt(e);
+    };
+    // @ts-expect-error abc
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    // Nettoyez l'effet
+    return () => {
+      // @ts-expect-error abc
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
+    };
+  }, []);
+
   return (
     <>
       {isReady ? (
@@ -231,20 +272,11 @@ function App() {
       ) : (
         <div>
           <button onClick={handleIsReady}>Je suis prêt</button>
-          <button
-            onClick={() => {
-              let deferredPrompt;
-              window.addEventListener("beforeinstallprompt", (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-
-                // @ts-expect-error abc
-                deferredPrompt.prompt();
-              });
-            }}
-          >
-            Installer
-          </button>
+          {deferredPrompt && (
+            <button onClick={promptInstall} className="pwa-install-button">
+              Installer l'application
+            </button>
+          )}
         </div>
       )}
     </>
