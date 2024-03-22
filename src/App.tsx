@@ -37,7 +37,19 @@ function App() {
   const [isTalking, setIsTalking] = useState(false);
   const [speechRecognition, setSpeechRecognition] = useState<unknown>(null);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [PWAIsInstalled, setPWAIsInstalled] = useState(false);
+
+  const isPWAInstalledIos = () => {
+    // @ts-expect-error abc
+    return window.navigator.standalone === true;
+  };
+
+  const isPWAInstalledAndroid = () => {
+    return window.matchMedia("(display-mode: standalone)").matches;
+  };
+
+  const [PWAIsInstalled, setPWAIsInstalled] = useState(
+    isPWAInstalledIos() || isPWAInstalledAndroid()
+  );
 
   const isSafari = () => {
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -145,15 +157,6 @@ function App() {
         setDeferredPrompt(null);
       });
     }
-  };
-
-  const isPWAInstalledIos = () => {
-    // @ts-expect-error abc
-    return window.navigator.standalone === true;
-  };
-
-  const isPWAInstalledAndroid = () => {
-    return window.matchMedia("(display-mode: standalone)").matches;
   };
 
   useEffect(() => {
