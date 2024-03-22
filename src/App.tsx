@@ -272,11 +272,11 @@ function App() {
       ) : (
         <div>
           <button onClick={handleIsReady}>Je suis prêt</button>
-          {deferredPrompt && (
-            <button onClick={promptInstall} className="pwa-install-button">
-              Installer l'application
-            </button>
-          )}
+          {/* {deferredPrompt && ( */}
+          <button onClick={promptInstall} className="pwa-install-button">
+            Installer l'application
+          </button>
+          {/* )} */}
         </div>
       )}
     </>
