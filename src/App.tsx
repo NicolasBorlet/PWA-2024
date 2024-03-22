@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Square from "./components/SquareComponent";
 
-let colors = [
+const colors = [
   {
     id: 1,
     name: "Red",
@@ -47,7 +47,7 @@ function App() {
       ...sequence,
       colors[Math.floor(Math.random() * colors.length)].id,
     ];
-    
+
     setIsReady(true);
     setSequence(newSequence);
   }, [sequence]);
@@ -105,18 +105,22 @@ function App() {
 
   useEffect(() => {
     //@ts-ignore
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
-      recognition.lang = 'fr-FR';
+      recognition.lang = "fr-FR";
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
       recognition.onresult = (event: any) => {
         // Sépare les mots prononcés dans la transcription
-        const spokenWords = event.results[0][0].transcript.trim().toLowerCase().split(' ');
+        const spokenWords = event.results[0][0].transcript
+          .trim()
+          .toLowerCase()
+          .split(" ");
         // Créez une copie temporaire de l'index actuel pour le vérifier contre la séquence
         let tempIndex = currentIndex;
-      
+
         // Vérifiez chaque mot prononcé contre la séquence attendue
         for (const word of spokenWords) {
           //@ts-ignore
@@ -129,7 +133,10 @@ function App() {
               // Si toutes les couleurs ont été correctement identifiées, ajoutez une nouvelle couleur
               console.log("Sequence completed, add new color");
               setIsPlayerToPlay(false); // Empêche d'autres clics pendant la mise à jour de la séquence
-              const newSequence = [...sequence, colors[Math.floor(Math.random() * colors.length)].id];
+              const newSequence = [
+                ...sequence,
+                colors[Math.floor(Math.random() * colors.length)].id,
+              ];
               setSequence(newSequence);
               setCurrentIndex(0);
               break; // Sortie de la boucle, car la séquence est terminée
@@ -144,13 +151,13 @@ function App() {
             break; // Sortie de la boucle après une erreur
           }
         }
-      
+
         // Mise à jour de l'indice courant si toutes les couleurs étaient correctes
         if (tempIndex !== currentIndex && tempIndex < sequence.length) {
           setCurrentIndex(tempIndex);
           setIsPlayerToPlay(true); // Permettre au joueur de continuer à jouer
         }
-      };         
+      };
       setSpeechRecognition(recognition);
     }
   }, [isPlayerToPlay]); // Ajout de isPlayerToPlay dans les dépendances pour réinitialiser l'API de reconnaissance vocale en fonction de l'état du jeu
@@ -180,7 +187,9 @@ function App() {
     };
 
     if (highlightIndex !== undefined && !isPlayerToPlay) {
-      speakColor(colors.find(color => color.id === highlightIndex)?.name || '');
+      speakColor(
+        colors.find((color) => color.id === highlightIndex)?.name || ""
+      );
     }
   }, [highlightIndex, isPlayerToPlay]);
 
@@ -192,7 +201,11 @@ function App() {
             {colors.map((color) => (
               <Square
                 key={color.id}
-                color={highlightIndex === color.id && !isPlayerToPlay ? color.highlightColor : color.color}
+                color={
+                  highlightIndex === color.id && !isPlayerToPlay
+                    ? color.highlightColor
+                    : color.color
+                }
                 name={color.name}
                 id={color.id}
                 clickable={isPlayerToPlay}
@@ -202,19 +215,33 @@ function App() {
               />
             ))}
           </div>
-          <button 
-              onMouseDown={startTalking} 
-              onMouseUp={stopTalking} 
-              onTouchStart={startTalking} // Pour les appareils tactiles
-              onTouchEnd={stopTalking}
-              className="talk-button"
-            >
-              {isTalking ? "Parler" : "Parler (cliquez et parlez)"}
-            </button>
+          <button
+            onMouseDown={startTalking}
+            onMouseUp={stopTalking}
+            onTouchStart={startTalking} // Pour les appareils tactiles
+            onTouchEnd={stopTalking}
+            className="talk-button"
+          >
+            {isTalking ? "Parler" : "Parler (cliquez et parlez)"}
+          </button>
         </>
       ) : (
         <div>
           <button onClick={handleIsReady}>Je suis prêt</button>
+          <button
+            onClick={() => {
+              let deferredPrompt;
+              window.addEventListener("beforeinstallprompt", (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+
+                // @ts-expect-error abc
+                deferredPrompt.prompt();
+              });
+            }}
+          >
+            Installer
+          </button>
         </div>
       )}
     </>
