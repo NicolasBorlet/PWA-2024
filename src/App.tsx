@@ -147,6 +147,14 @@ function App() {
     }
   };
 
+  const isPWAInstalledIos = () => {
+    return window.navigator.standalone === true;
+  };
+
+  const isPWAInstalledAndroid = () => {
+    return window.matchMedia("(display-mode: standalone)").matches;
+  };
+
   useEffect(() => {
     const SpeechRecognition =
       // @ts-expect-error abc
@@ -239,16 +247,32 @@ function App() {
   }, [highlightIndex, isPlayerToPlay]);
 
   useEffect(() => {
+    // Détecter si la PWA est déjà installé sur l'appareil
+    window.addEventListener("appinstalled", () => {
+      setPWAIsInstalled(true);
+    });
+
+    let isAppInstalled = true;
+
     const handleBeforeInstallPrompt = (e: undefined) => {
       // Empêche Chrome 67 et versions antérieures d'afficher automatiquement le prompt
       // @ts-expect-error abc
       e.preventDefault();
+
+      isAppInstalled = false;
       // Stockez l'événement pour pouvoir le déclencher plus tard
       // @ts-expect-error abc
       setDeferredPrompt(e);
     };
     // @ts-expect-error abc
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    // Vérifiez si l'application est déjà installée
+    if (isPWAInstalledIos() || isPWAInstalledAndroid()) {
+      setPWAIsInstalled(true);
+    } else {
+      setPWAIsInstalled(false);
+    }
 
     // Nettoyez l'effet
     return () => {
